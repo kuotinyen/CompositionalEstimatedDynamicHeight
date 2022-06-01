@@ -55,7 +55,7 @@ class ViewController: UIViewController {
     
     private func makeCollectionViewLayout() -> UICollectionViewCompositionalLayout {
         let sectionProvider = { (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
-            let heightDimension = NSCollectionLayoutDimension.estimated(44)
+            let heightDimension = NSCollectionLayoutDimension.estimated(300)
             
             let itemSize = NSCollectionLayoutSize(
                 widthDimension: .fractionalWidth(1),
@@ -87,7 +87,12 @@ class ViewController: UIViewController {
         }
         
         dataSource = DataSource(collectionView: collectionView) { (collectionView, indexPath, item) -> UICollectionViewCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: imageCellRegistration, for: indexPath, item: item)
+            let cell = collectionView.dequeueConfiguredReusableCell(using: imageCellRegistration, for: indexPath, item: item)
+            cell.didUpdateHeight = { [weak self] in
+                guard let self = self else { return }
+                self.collectionView.reloadData()
+            }
+            return cell
         }
     }
 }

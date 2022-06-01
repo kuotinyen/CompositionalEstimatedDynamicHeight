@@ -11,6 +11,9 @@ import SDWebImage
 
 class ImageCell: UICollectionViewCell {
     
+    var didUpdateHeight: (() -> Void)?
+    var heightConstraint: Constraint?
+    
     private let imageView: UIImageView = {
         let imageView = UIImageView()
         imageView.backgroundColor = .lightGray
@@ -31,7 +34,7 @@ class ImageCell: UICollectionViewCell {
         contentView.addSubview(imageView)
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
-            make.height.equalTo(0)
+            heightConstraint = make.height.equalTo(0).constraint
         }
     }
     
@@ -43,8 +46,6 @@ class ImageCell: UICollectionViewCell {
                 if let image = image {
                     self.imageView.image = image
                     self.updateImageHeightConstraint(size: image.size)
-                    self.contentView.layoutIfNeeded()
-                    self.layoutIfNeeded()
                 }
             }
         }
@@ -52,11 +53,13 @@ class ImageCell: UICollectionViewCell {
     
     private func updateImageHeightConstraint(size: CGSize) {
         let widthHeightRatio = size.height / size.width
-        imageView.snp.remakeConstraints { make in
+        imageView.snp.updateConstraints { make in
             let height = UIScreen.main.bounds.width * widthHeightRatio
-            make.edges.equalToSuperview()
-            make.height.equalTo(500)
+            heightConstraint = make.height.equalTo(500).constraint
+            
         }
+        
+        didUpdateHeight?()
     }
 }
 
